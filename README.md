@@ -107,7 +107,7 @@ What we're achieving with *DebugActiveProcessStop* is detaching from the process
 DebugActiveProcessStop(pi->dwProcessId)
 ```
 
-### Process Hypnosis Pt.3 - Profit
+### Process Hypnosis Pt.4 - Profit
 
 In the following figure, we observe how it was possible to enumerate the different modules that were loaded into the remote process *(mrt.exe)* without the need for *GetModuleHandle* or a direct call to *LoadLibrary*. This was made possible thanks to the **LOAD_DLL_DEBUG_EVENT** event.
 
@@ -121,17 +121,17 @@ Finally, we can see how it's possible to execute our malicious code and perform 
 
 ![image](https://github.com/CarlosG13/Process-Hypnosis-Debugger-assisted-control-flow-hijack/assets/69405457/3903251b-6168-4939-b887-5495ca8a87b6)
 
-### Process Hypnosis Pt.4 - Attack Summary
+### Process Hypnosis Pt.5 - Attack Summary
 
 ![image](https://github.com/CarlosG13/Process-Hypnosis-Debugger-assisted-control-flow-hijack/assets/69405457/edf0f80e-b9db-46b4-8d62-dcd3282dcbd1)
 
-### Process Hypnosis Pt.5 - What do we evade and achieve?
+### Process Hypnosis Pt.6 - What do we evade and achieve?
 
   * We can use *DEBUG_ONLY_THIS_PROCESS* as an alternative to the well-known *CREATE_SUSPENDED* flag.
     
   * We evade mechanisms such as *IAT* and *Inline Hooking*, as we avoid the use of well-known functions like *VirtualAllocEx*, *CreateRemoteThread*, *ResumeThread*, among others.
 
-### Process Hypnosis Pt.6 - Detection
+### Process Hypnosis Pt.7 - Detection
 
 Based on my research, I identified a distinctive indicator that could be leveraged that could be leveraged to detect this type of attack. Essentially, when the process is being debugged, it invokes the function *"RtlQueryProcessDebugInformationRemote"*. The issue arises from the undocumented nature of this function (it is not referenced in any documentation).
 
