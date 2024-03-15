@@ -37,14 +37,16 @@ Debugging the Windows kernel, I realized that it is indeed possible to freeze an
 
 ### Process Hypnosis Pt.3 - Steps to reproduce
 
-**1.** The first step is to create a new process with *CreateProcessW*, but instead of using the *CREATE_SUSPENDED* flag, we'll use *DEBUG_PROCESS*. As a result, we declare ourselves as the debugger for the new child process being created.
+**1.** The first step is to create a new process with *CreateProcessW*, but instead of using the *CREATE_SUSPENDED* flag, we'll use *DEBUG_ONLY_THIS_PROCESS*. As a result, we declare ourselves as the debugger for the new child process being created.
+
+**IMPORTANT:** We could also utilize the *DEBUG_PROCESS* flag instead of *DEBUG_ONLY_THIS_PROCESS*. However, for our purpose, *DEBUG_PROCESS* is not necessary because we would not be fully leveraging all that this flag offers. The distinction lies in the fact that *DEBUG_PROCESS* is employed when we want to *debug a new process and any child processes it spawns*. In our use case, we do not intend to interact with or debug child processes, as *we will be injecting code directly into the new process*; therefore, *DEBUG_ONLY_THIS_PROCESS* is the optimal approach.
 
 ```cpp
 wchar_t cmdLine[] = L"C:\\Windows\\System32\\mrt.exe";
-CreateProcessW(NULL, cmdLine, NULL, NULL, FALSE, DEBUG_PROCESS, NULL, NULL, si, pi)
+CreateProcessW(NULL, cmdLine, NULL, NULL, FALSE, DEBUG_ONLY_THIS_PROCESS, NULL, NULL, si, pi)
 ```
 
-Due to the *DEBUG_PROCESS* flag, the threads of the new process will be *frozen*. This works this way because the process has new **debugging events** pending to be sent.
+Due to the *DEBUG_ONLY_THIS_PROCESS* flag, the threads of the new process will be *frozen*. This works this way because the process has new **debugging events** pending to be sent.
 
 At this point, it's possible to observe in action how the main thread is *frozen* just at the moment when the process to be debugged *(mrt.exe)* is created by placing a **BreakPoint** in the *'PsFreezeProcess'* function:
 
@@ -121,10 +123,18 @@ Finally, we can see how it's possible to execute our malicious code and perform 
 
 ### Process Hypnosis Pt.4 - Attack Summary
 
-![image](https://github.com/CarlosG13/Process-Hypnosis-Debugger-assisted-control-flow-hijack/assets/69405457/f898478c-9a65-4f2b-a601-25a73210fb50)
+![image](https://github.com/CarlosG13/Process-Hypnosis-Debugger-assisted-control-flow-hijack/assets/69405457/edf0f80e-b9db-46b4-8d62-dcd3282dcbd1)
 
 ### Process Hypnosis Pt.5 - What do we evade and achieve?
 
-  * We can use *DEBUG_PROCESS* as an alternative to the well-known *CREATE_SUSPENDED* flag.
+  * We can use *DEBUG_ONLY_THIS_PROCESS* as an alternative to the well-known *CREATE_SUSPENDED* flag.
     
   * We evade mechanisms such as *IAT* and *Inline Hooking*, as we avoid the use of well-known functions like *VirtualAllocEx*, *CreateRemoteThread*, *ResumeThread*, among others.
+
+### Process Hypnosis Pt.6 - Detection
+
+Based on my research, I identified a distinctive indicator that could be leveraged that could be leveraged to detect this type of attack. Essentially, when the process is being debugged, it invokes the function *"RtlQueryProcessDebugInformationRemote"*. The issue arises from the undocumented nature of this function (it is not referenced in any documentation).
+
+![image](https://github.com/CarlosG13/Process-Hypnosis-Debugger-assisted-control-flow-hijack/assets/69405457/499b2bd2-d089-4f43-8922-dcdbfe44a336)
+
+
