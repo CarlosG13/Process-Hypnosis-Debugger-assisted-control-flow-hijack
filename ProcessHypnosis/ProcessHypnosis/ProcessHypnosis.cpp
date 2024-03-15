@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 
 	wchar_t cmdLine[] = L"C:\\Windows\\System32\\mrt.exe";
 
-	if (CreateProcessW(NULL, cmdLine, NULL, NULL, FALSE, DEBUG_PROCESS, NULL, NULL, si, pi)) {// Create new process with DEBUG_PROCESS flag.
+	if (CreateProcessW(NULL, cmdLine, NULL, NULL, FALSE, DEBUG_ONLY_THIS_PROCESS, NULL, NULL, si, pi)) {// Create new process with DEBUG_PROCESS flag.
 
 		printf("[+] Process [DEBUG] created successfully - PID: %d\n", pi->dwProcessId);
 	}
