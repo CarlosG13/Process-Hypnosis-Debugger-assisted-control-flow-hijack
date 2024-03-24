@@ -133,8 +133,12 @@ Finally, we can see how it's possible to execute our malicious code and perform 
 
 ### Process Hypnosis Pt.7 - Detection
 
-Based on my research, I identified a distinctive indicator that could be leveraged that could be leveraged to detect this type of attack. Essentially, when the process is being debugged, it invokes the function *"RtlQueryProcessDebugInformationRemote"*. The issue arises from the undocumented nature of this function (it is not referenced in any documentation).
+Based on my research, I identified a distinctive indicator that could be leveraged to detect this type of attack. Essentially, when the process is being debugged, it invokes the function *"RtlQueryProcessDebugInformationRemote"*. The issue arises from the undocumented nature of this function (it is not referenced in any documentation).
 
 ![image](https://github.com/CarlosG13/Process-Hypnosis-Debugger-assisted-control-flow-hijack/assets/69405457/499b2bd2-d089-4f43-8922-dcdbfe44a336)
+
+On the other hand, besides considering the call to the *RtlQueryProcessDebugInformationRemote* function, we can also pay attention to calls to *CreateProcess* when flags such as *DEBUG_PROCESS* or *DEBUG_ONLY_THIS_PROCESS* are used.
+
+
 
 
